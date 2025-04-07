@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 import type { Post } from '@/types/Post'
@@ -24,6 +24,15 @@ const truncateText = (text: string, maxLength: number) => {
   return text.length > maxLength ? text.slice(0, maxLength) + '...' : text
 }
 
+// Computed property to get and set the search term in the store
+const localSearchTerm = computed({
+  get: () => store.searchTerm, // Get the search term from the store
+  set: (value: string) => {
+    store.setSearchTerm(value)
+    loadPosts()
+  }, // Set the search term in the store
+})
+
 watch(
   () => route.params.page,
   (newPage) => {
@@ -37,6 +46,13 @@ onMounted(loadPosts)
 
 <template>
   <div class="p-4">
+    <!-- Search field -->
+    <input
+      v-model="localSearchTerm"
+      type="text"
+      class="mb-4 p-2 border rounded-lg"
+      placeholder="Search for posts..."
+    />
     <h1 class="text-2xl font-bold mb-4">Posts - Page {{ page }}</h1>
     <div v-if="loading" class="text-gray-500">Loading...</div>
     <div v-else>
@@ -46,6 +62,7 @@ onMounted(loadPosts)
           <p class="text-sm text-gray-600">{{ truncateText(post.body, 100) }}</p>
         </div>
       </RouterLink>
+      <h2 v-if="!posts.length" class="font-semibold">Mo more posts :(</h2>
 
       <div class="mt-6 flex gap-4">
         <RouterLink
@@ -58,6 +75,7 @@ onMounted(loadPosts)
         <RouterLink
           :to="`/${page + 1}`"
           class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          v-if="posts.length == 10"
         >
           Next
         </RouterLink>

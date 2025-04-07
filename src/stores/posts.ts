@@ -3,9 +3,12 @@ import { defineStore } from 'pinia'
 import type { Post } from '@/types/Post'
 import type { Comment } from '@/types/Comment'
 
+import Fuse from 'fuse.js'
+
 export const usePostsStore = defineStore('posts', {
   state: () => ({
     postsCache: {} as Record<number, Post[]>,
+    searchTerm: '', // The search term
     currentPost: null as Post | null,
     commentsCache: {} as Record<number, Comment[]>, // Cache for comments
   }),
@@ -15,9 +18,18 @@ export const usePostsStore = defineStore('posts', {
      * Fetch posts for a specific page
      * Returns a promise that resolves to a list of posts
      */
+    // Fetch posts for a specific page
     async fetchPosts(page: number): Promise<Post[]> {
+      // If posts are already cached for the page, use them
       if (this.postsCache[page]) return this.postsCache[page]
 
+      if (this.searchTerm) {
+        const res = await fetch(`https://jsonplaceholder.typicode.com/posts`)
+        const data = await res.json()
+        const filteredData = this.filterPosts(data, page)
+        this.postsCache[page] = filteredData
+        return filteredData
+      }
       const start = (page - 1) * 10
       const res = await fetch(
         `https://jsonplaceholder.typicode.com/posts?_start=${start}&_limit=10`,
@@ -25,6 +37,30 @@ export const usePostsStore = defineStore('posts', {
       const data = await res.json()
       this.postsCache[page] = data
       return data
+    },
+
+    // Use Fuse.js to filter posts for partial matching and return posts for the given page
+    filterPosts(posts: Post[], page: number): Post[] {
+      if (!this.searchTerm) return posts.slice((page - 1) * 10, page * 10)
+
+      const fuse = new Fuse(posts, {
+        keys: ['title', 'body'],
+        threshold: 0.3, // Adjust this to control the fuzziness of the match
+      })
+
+      // Perform search
+      const result = fuse.search(this.searchTerm)
+
+      // Return a set of 10 or less posts corresponding to the given page
+      const pagedResults = result.map((r) => r.item).slice((page - 1) * 10, page * 10)
+
+      return pagedResults
+    },
+
+    // Set the search term in the store and refetch posts
+    setSearchTerm(searchTerm: string) {
+      this.searchTerm = searchTerm
+      this.postsCache = {}
     },
 
     /**
