@@ -19,7 +19,7 @@
           Previous
         </RouterLink>
         <RouterLink
-          :to="`/${parseInt(page) + 1}`"
+          :to="`/${page + 1}`"
           class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Next
@@ -33,10 +33,13 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
-const route = useRoute()
-const page = ref(route.params.page)
+import type { Post } from '@/types/Post'
 
-const posts = ref([])
+const route = useRoute()
+const pageParam = route.params.page
+const page = ref<number>(Number(pageParam) || 1)
+
+const posts = ref<Post[]>([])
 const loading = ref(true)
 
 const fetchPosts = async () => {
@@ -50,7 +53,7 @@ const fetchPosts = async () => {
 watch(
   () => route.params.page,
   (newPage) => {
-    page.value = newPage
+    page.value = Number(newPage) || 1
     fetchPosts()
   },
 )

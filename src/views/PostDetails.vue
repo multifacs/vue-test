@@ -17,9 +17,11 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
+import type { Post } from '@/types/Post'
+
 const route = useRoute()
 const id = route.params.id
-const post = ref(null)
+const post = ref<Post | null>(null)
 const loading = ref(true)
 
 const fetchPost = async () => {
