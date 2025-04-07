@@ -1,18 +1,21 @@
-# vue-test
+# Тестовое задание cyberform.systems
 
-This template should help get you started developing with Vue 3 in Vite.
+Тестовое задание от cyberform.systems для позицию фронтенд-разработчика на Vue (junior+/middle)
 
-## Recommended IDE Setup
+## Требования:
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- Используя https://jsonplaceholder.typicode.com/ подтянуть посты
+- Выводить на страницу по 10 постов, реализовать паггинацию
+- Сделать страницу отдельного поста и переход на нее
+- Для инициализации проекта использовать Vite
+- Основы стека - Vue/Ts
+- В коде не должно быть any, в консоли ошибок
+- Постарайтесь продемонстрировать максимально оптимальную структуру и чистый код
 
-## Type Support for `.vue` Imports in TS
+## В качестве дополнительных требований:
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
+- Реализовать поиск по постам
+- Следовать принципам FSD
 
 ## Project Setup
 
