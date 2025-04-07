@@ -20,6 +20,10 @@ const loadPosts = async () => {
   loading.value = false
 }
 
+const truncateText = (text: string, maxLength: number) => {
+  return text.length > maxLength ? text.slice(0, maxLength) + '...' : text
+}
+
 watch(
   () => route.params.page,
   (newPage) => {
@@ -39,7 +43,7 @@ onMounted(loadPosts)
       <RouterLink :to="`/post/${post.id}`" v-for="post in posts" :key="post.id">
         <div class="mb-2 p-4 border rounded-lg bg-white shadow-sm hover:bg-gray-50 transition">
           <h2 class="font-semibold">{{ post.title }}</h2>
-          <p class="text-sm text-gray-600">{{ post.body }}</p>
+          <p class="text-sm text-gray-600">{{ truncateText(post.body, 100) }}</p>
         </div>
       </RouterLink>
 
