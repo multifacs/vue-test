@@ -5,9 +5,12 @@ import type { Comment } from '@/types/Comment'
 
 import Fuse from 'fuse.js'
 
+/**
+ * Posts data fetch store
+ */
 export const usePostsStore = defineStore('posts', {
   state: () => ({
-    postsCache: {} as Record<number, Post[]>,
+    postsCache: {} as Record<number, Post[]>, // Cache for posts
     searchTerm: '', // The search term
     currentPost: null as Post | null,
     commentsCache: {} as Record<number, Comment[]>, // Cache for comments
@@ -20,7 +23,7 @@ export const usePostsStore = defineStore('posts', {
      */
     // Fetch posts for a specific page
     async fetchPosts(page: number): Promise<Post[]> {
-      // If posts are already cached for the page, use them
+      // Search in cache
       if (this.postsCache[page]) return this.postsCache[page]
 
       if (this.searchTerm) {
@@ -39,25 +42,24 @@ export const usePostsStore = defineStore('posts', {
       return data
     },
 
-    // Use Fuse.js to filter posts for partial matching and return posts for the given page
+    /**
+     * Use Fuse.js to filter posts for partial matching and return posts for the given page
+     */
+    // Fuse.js may be useful for later to process bigger sets of data idk
     filterPosts(posts: Post[], page: number): Post[] {
       if (!this.searchTerm) return posts.slice((page - 1) * 10, page * 10)
-
       const fuse = new Fuse(posts, {
         keys: ['title', 'body'],
         threshold: 0.3, // Adjust this to control the fuzziness of the match
       })
-
       // Perform search
       const result = fuse.search(this.searchTerm)
-
       // Return a set of 10 or less posts corresponding to the given page
       const pagedResults = result.map((r) => r.item).slice((page - 1) * 10, page * 10)
-
       return pagedResults
     },
 
-    // Set the search term in the store and refetch posts
+    // Set the search term in the store and clear cache
     setSearchTerm(searchTerm: string) {
       this.searchTerm = searchTerm
       this.postsCache = {}
@@ -68,7 +70,7 @@ export const usePostsStore = defineStore('posts', {
      * Returns a promise that resolves to a single post or null if not found
      */
     async fetchPost(id: number): Promise<Post | null> {
-      // Try to find in cached posts
+      // Search in cache
       const allPosts = Object.values(this.postsCache).flat()
       const found = allPosts.find((p) => p.id === id)
       if (found) {
@@ -76,7 +78,6 @@ export const usePostsStore = defineStore('posts', {
         return found
       }
 
-      // Fetch from API
       const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`)
       if (!res.ok) {
         this.currentPost = null
@@ -93,7 +94,7 @@ export const usePostsStore = defineStore('posts', {
      * Returns a promise that resolves to a list of comments
      */
     async fetchComments(postId: number): Promise<Comment[]> {
-      // Check if comments for the post are cached
+      // Search in cache
       if (this.commentsCache[postId]) return this.commentsCache[postId]
 
       const res = await fetch(`https://jsonplaceholder.typicode.com/comments?postId=${postId}`)

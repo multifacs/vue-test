@@ -8,18 +8,19 @@ import { parsePageParam } from '@/utils/page'
 import { usePostsStore } from '@/stores/posts'
 
 const route = useRoute()
-const page = ref<number>(parsePageParam(route.params.page))
+const page = ref<number>(parsePageParam(route.params.page)) // Page param
 
-const store = usePostsStore()
-const posts = ref<Post[]>([])
-const loading = ref(true)
+const store = usePostsStore() // Store
+const posts = ref<Post[]>([]) // Posts data
+const loading = ref(true) // Local loading state
 
 const loadPosts = async () => {
   loading.value = true
-  posts.value = await store.fetchPosts(page.value)
+  posts.value = await store.fetchPosts(page.value) // Load from store
   loading.value = false
 }
 
+// Truncate post text and end it with ...
 const truncateText = (text: string, maxLength: number) => {
   return text.length > maxLength ? text.slice(0, maxLength) + '...' : text
 }
@@ -28,11 +29,12 @@ const truncateText = (text: string, maxLength: number) => {
 const localSearchTerm = computed({
   get: () => store.searchTerm, // Get the search term from the store
   set: (value: string) => {
-    store.setSearchTerm(value)
+    store.setSearchTerm(value) // Set the search term in the store
     loadPosts()
-  }, // Set the search term in the store
+  },
 })
 
+// Watch the page param change
 watch(
   () => route.params.page,
   (newPage) => {
@@ -41,7 +43,9 @@ watch(
   },
 )
 
-onMounted(loadPosts)
+onMounted(() => {
+  loadPosts() // Fetch on mounted
+})
 </script>
 
 <template>

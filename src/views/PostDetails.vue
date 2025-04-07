@@ -3,6 +3,9 @@ import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { usePostsStore } from '@/stores/posts'
 
+import type { Post } from '@/types/Post'
+import type { Comment } from '@/types/Comment'
+
 const route = useRoute()
 const store = usePostsStore()
 
@@ -23,7 +26,7 @@ const loadPostAndComments = async () => {
 }
 
 onMounted(() => {
-  loadPostAndComments() // Fetch post and comments when the component is mounted
+  loadPostAndComments() // Fetch on mounted
 })
 </script>
 

@@ -6,17 +6,17 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
+      path: '/', // Main page redirects to the 1st posts page
       redirect: '/1',
     },
     {
-      path: '/:page',
+      path: '/:page', // Dynamic param
       name: 'PostsPage',
       component: PostsPage,
       props: true,
     },
     {
-      path: '/post/:id',
+      path: '/post/:id', // Dynamic param
       name: 'PostDetails',
       component: PostDetails,
       props: true,
